@@ -1,20 +1,55 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { HomeScreen } from './components/HomeScreen'
+import { useState } from 'react'
+import { CadastroItem } from './components/itensCadastrados'
+import { Item } from './components/itensCadastrados'
+import { CadastroRestaurante } from './components/CadastroRestaurante'
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+type Restaurante = {
+  nome: string
+  descricao: string
+  foto: string | null
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  const [tela, settela] = useState<'Restaurante' | 'home' | 'cadastro'>('Restaurante')
+  const [itens, setitens] = useState<Item[]>([])
+  const [restaurante, setRestaurante] = useState<Restaurante>({
+    nome: '',
+    descricao: '',
+    foto: null
+  })
+  function CadastreRestaurante(
+    nome: string,
+    descricao: string,
+    foto: string | null
+  ) { setRestaurante({
+    nome,
+    descricao,
+    foto
+  })
+settela('home')
+  }
+
+  function adicionarItem(novoItem: Item) {
+    setitens((listaAtual) => [
+      ...listaAtual, novoItem])
+    settela('home')
+
+  }
+  if (tela === 'Restaurante') {
+    return (
+      <CadastroRestaurante continuar={CadastreRestaurante} />
+    )
+  }
+  if (tela === 'cadastro') {
+    return <CadastroItem
+      itens={itens}
+      adicionarItem={adicionarItem}
+      paraVoltar={() => settela('home')} />
+  }
+  return <HomeScreen
+    itens={itens}
+    quandoCadastrar={() => settela('cadastro')}
+    restaurante={restaurante} />
+
+}
